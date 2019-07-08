@@ -67,7 +67,7 @@ class RogueServer:
         self._host = lhost
         self._port = lport
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self._sock.bind((self._host, self._port))
+        self._sock.bind(('0.0.0.0', self._port))
         self._sock.listen(10)
 
     def handle(self, data):
