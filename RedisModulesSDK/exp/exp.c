@@ -29,7 +29,9 @@ int DoCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 		RedisModuleString *ret = RedisModule_CreateString(ctx, output, strlen(output));
 		RedisModule_ReplyWithString(ctx, ret);
 		pclose(fp);
-	}
+	} else {
+                return RedisModule_WrongArity(ctx);
+        }
     return REDISMODULE_OK;
 }
 
@@ -53,7 +55,9 @@ int RevShellCommand(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 		dup2(s, 2);
 
 		execve("/bin/sh", 0, 0);
-	}
+	} else {
+                return RedisModule_WrongArity(ctx);
+        }
     return REDISMODULE_OK;
 }
 
