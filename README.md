@@ -1,6 +1,6 @@
 # Redis Rogue Server
 
-A exploit for Redis(<=5.0.5) RCE, inspired by [Redis post-exploitation](https://2018.zeronights.ru/wp-content/uploads/materials/15-redis-post-exploitation.pdf).
+An exploit for Redis(<=5.0.5) RCE, inspired by [Redis post-exploitation](https://2018.zeronights.ru/wp-content/uploads/materials/15-redis-post-exploitation.pdf).
 
 __Support interactive shell and reverse shell!__
 
@@ -8,7 +8,7 @@ __Support interactive shell and reverse shell!__
 
 Python 3.6+
 
-If you want to modify or recompile the redis module, you also require `make`.
+If you want to modify or recompile the redis module, you should also require `make`.
 
 ## Usage
 
