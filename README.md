@@ -8,6 +8,8 @@ __Support interactive shell and reverse shell!__
 
 Python 3.6+
 
+## Additontional step
+### You don't have to do this unless you believe it's necessary.
 If you want to modify or recompile the redis module, you also require `make`.
 
 ## Usage
