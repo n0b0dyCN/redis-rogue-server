@@ -49,6 +49,7 @@ Options:
   --lport=LOCAL_PORT   rogue server listen port, default 21000
   --exp=EXP_FILE       Redis Module to load, default exp.so
   -v, --verbose        Show full data stream
+  -a, --auth           Password to use when connecting to the server
 ```
 
 ## Example
