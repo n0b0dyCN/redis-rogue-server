@@ -2,6 +2,8 @@
 
 A exploit for Redis(<=5.0.5) RCE, inspired by [Redis post-exploitation](https://2018.zeronights.ru/wp-content/uploads/materials/15-redis-post-exploitation.pdf).
 
+It's also been tested through redis version 5.0.9 (Redis key-value store)
+
 __Support interactive shell and reverse shell!__
 
 ## Requirements
