@@ -84,6 +84,8 @@ class Remote:
     def do(self, cmd):
         self.send(encode_cmd(cmd))
         buf = self.recv()
+        if buf.startswith('-ERR '):
+            raise Exception('failed to execute command: ' + buf)
         return buf
 
     def shell_cmd(self, cmd):
